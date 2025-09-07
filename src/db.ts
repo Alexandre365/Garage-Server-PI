@@ -1,0 +1,115 @@
+import sqlite3 from 'sqlite3';
+import {Database, open} from 'sqlite';
+import fs from 'fs';
+import path = require('path');
+
+let db: Database<sqlite3.Database, sqlite3.Statement>
+const dbFile = path.join(__dirname, 'data', 'banco.db');
+const exists = fs.existsSync(dbFile)
+
+type propsProduct = {
+  title: string;
+  description: string;
+  value: number;
+  category: string;
+}
+type propsUpdateProduct = {
+  title: string;
+  description: string;
+  value: number;
+  category: string;
+  id: number;
+}
+
+
+open({
+    filename: dbFile,
+    driver: sqlite3.Database
+})
+.then(async dBase => {
+    db = dBase
+
+    try {
+            if (!exists) {
+            await db.run(
+                `CREATE TABLE Product (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                value REAL NOT NULL,
+                category TEXT NOT NULL
+                )`
+            )
+            console.log(await db.all("SELECT * from Product"));
+            }
+    } catch (dbError) {
+        console.error(dbError);
+    }
+})
+
+
+// Get the messages in the database
+let getAllProduct = async (): Promise<any[] | undefined> => {
+    try {
+    return await db.all("SELECT * from Product");
+    } catch (dbError) {
+    console.error(dbError);
+    }
+}
+let getProduct =async (id: number): Promise<any[] | undefined> => {
+    try {
+    return await db.all(`
+        SELECT * from Product
+        WHERE id = ?
+      `,id);
+    } catch (dbError) {
+    console.error(dbError);
+    }
+}
+let setProduct = async (item: propsProduct): Promise<any[] | undefined> => {
+  const { title, description, value, category } = item
+  try {
+    db.run(
+        `
+        INSERT INTO Product (title, description, value, category)
+        VALUES (?, ?, ?, ?)
+      `,
+        title, description, value, category
+    );
+    return await db.all("SELECT * from Product");
+  } catch (dbError) {
+    console.error(dbError);
+    return undefined;
+  }
+};
+let deleteProduct = async (id: number): Promise<any[] | undefined> =>{
+  try {
+    db.run(`
+      DELETE FROM Product WHERE id = ?;
+    `,id);
+    return await db.all("SELECT * from Product");
+  } catch (dbError) {
+    console.error(dbError);
+    return undefined;
+  }
+}
+let updateProduct = async (item: propsUpdateProduct): Promise<any[] | undefined> =>{
+  const { title, description, value, category, id } = item
+  try {
+    db.run(`
+      UPDATE Product
+      SET title = ?,
+          description = ?,
+          value = ?,
+          category = ?
+      WHERE id = ?
+    `,title, description, value, category, id);
+    return await db.all("SELECT * from Product");
+  } catch (dbError) {
+    console.error(dbError);
+    return undefined;
+  }
+}
+
+
+export {getAllProduct, getProduct, setProduct, deleteProduct, updateProduct}
