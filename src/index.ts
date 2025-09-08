@@ -3,6 +3,7 @@ import {getAllProduct, getProduct, setProduct, deleteProduct, updateProduct} fro
 import cors from '@fastify/cors';
 
 const server = Fastify();
+const PORT = Number(process.env.PORT || 3000);
 
 const errorMessage ="Whoops! Error connecting to the database–please try again!";
 
@@ -101,6 +102,9 @@ server.put("/Product", async (
     reply.status(status).send(data);
 })
 
-server.listen({ port: 3000 }, () => {
-  console.log('🚀 Servidor rodando em http://localhost:3000');
-});
+server.listen({ port: PORT, host: "0.0.0.0" })
+  .then(() => console.log(`🚀 Servidor rodando em ${PORT}`))
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
