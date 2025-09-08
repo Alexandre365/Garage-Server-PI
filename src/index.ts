@@ -5,7 +5,7 @@ import cors from '@fastify/cors';
 const server = Fastify();
 
 const errorMessage ="Whoops! Error connecting to the database–please try again!";
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT || 3000);
 
 interface CreateProductRoute extends RouteGenericInterface {
   Body: {
@@ -102,6 +102,9 @@ server.put("/Product", async (
     reply.status(status).send(data);
 })
 
-server.listen({ port: Number(PORT), host: "0.0.0.0" }, () => {
-  console.log('🚀 Servidor rodando em http://localhost:3000');
-});
+server.listen({ port: PORT, host: "0.0.0.0" })
+  .then(() => console.log(`Server running on port ${PORT}`))
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
