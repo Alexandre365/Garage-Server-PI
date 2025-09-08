@@ -101,6 +101,6 @@ server.put("/Product", async (
     reply.status(status).send(data);
 })
 
-server.listen({ port: 3000,  host: "0.0.0.0" }, () => {
+server.listen({ port: 3000 }, () => {
   console.log('🚀 Servidor rodando em http://localhost:3000');
 });
