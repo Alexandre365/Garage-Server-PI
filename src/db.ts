@@ -1,11 +1,18 @@
 import sqlite3 from 'sqlite3';
-import {Database, open} from 'sqlite';
+import { Database, open } from 'sqlite';
 import fs from 'fs';
-import path = require('path');
+import path from 'path';
 
-let db: Database<sqlite3.Database, sqlite3.Statement>
-const dbFile = path.join(__dirname, 'data', 'banco.db');
-const exists = fs.existsSync(dbFile)
+let db: Database<sqlite3.Database, sqlite3.Statement>;
+
+// Garantir que a pasta exista
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const dbFile = path.join(dataDir, 'banco.db');
+const exists = fs.existsSync(dbFile);
 
 type propsProduct = {
   title: string;
