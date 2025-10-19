@@ -73,37 +73,38 @@ let getProduct =async (id: number): Promise<any[] | undefined> => {
     console.error(dbError);
     }
 }
-let setProduct = async (item: propsProduct): Promise<any[] | undefined> => {
+let setProduct = async (item: propsProduct): Promise<number | undefined> => {
   const { title, description, value, category } = item
   try {
-    db.run(
+    const result = await db.run(
         `
         INSERT INTO Product (title, description, value, category)
         VALUES (?, ?, ?, ?)
       `,
         title, description, value, category
     );
-    return await db.all("SELECT * from Product");
+    
+    return result.changes
   } catch (dbError) {
     console.error(dbError);
     return undefined;
   }
 };
-let deleteProduct = async (id: number): Promise<any[] | undefined> =>{
+let deleteProduct = async (id: number): Promise<number | undefined> =>{
   try {
-    db.run(`
+    const result = await db.run(`
       DELETE FROM Product WHERE id = ?;
     `,id);
-    return await db.all("SELECT * from Product");
+    return result.changes
   } catch (dbError) {
     console.error(dbError);
     return undefined;
   }
 }
-let updateProduct = async (item: propsUpdateProduct): Promise<any[] | undefined> =>{
+let updateProduct = async (item: propsUpdateProduct): Promise<number | undefined> =>{
   const { title, description, value, category, id } = item
   try {
-    db.run(`
+    const result = await db.run(`
       UPDATE Product
       SET title = ?,
           description = ?,
@@ -111,7 +112,7 @@ let updateProduct = async (item: propsUpdateProduct): Promise<any[] | undefined>
           category = ?
       WHERE id = ?
     `,title, description, value, category, id);
-    return await db.all("SELECT * from Product");
+    return result.changes
   } catch (dbError) {
     console.error(dbError);
     return undefined;
